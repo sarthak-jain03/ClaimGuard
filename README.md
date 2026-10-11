@@ -4,6 +4,8 @@ An enterprise expense claim review application that validates employee expense c
 
 ---
 
+## Live Link: https://claim-guard-lac.vercel.app
+
 ## Overview
 
 ClaimGuard streamlines the corporate expense review cycle. When employees submit claims, the system evaluates the submission through a two-tier review pipeline:
