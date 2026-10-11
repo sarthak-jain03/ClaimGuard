@@ -70,7 +70,7 @@ ClaimGuard/
 - **Frontend**: React 19, Vite, Tailwind CSS, Lucide Icons
 - **Backend**: Python 3.11, FastAPI, Uvicorn, Pydantic, Motor (Async MongoDB), Groq SDK
 - **Database**: MongoDB Atlas (with in-memory fallback)
-- **Currency**: INR (`₹`)
+
 
 ---
 
@@ -98,14 +98,7 @@ GROQ_MODEL=openai/gpt-oss-120b
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority
 MONGODB_DB_NAME=claimguard
 PORT=8000
-
-# Service & Deployment URLs
-FRONTEND_URL=http://localhost:5173
-BACKEND_URL=http://localhost:8000
-VITE_API_BASE_URL=http://localhost:8000/api
 ```
-
-A template file is available in the repository root at `.env.example`.
 
 ---
 
@@ -189,45 +182,4 @@ The frontend will be running at [http://localhost:5173](http://localhost:5173).
 | `DELETE`| `/api/claims` | Clear stored claims and audit records |
 
 ---
-
-## Production Deployment Guide
-
-When deploying ClaimGuard to production, the frontend and backend communicate via environment variables.
-
-### 1. Backend Deployment (Render, Railway, AWS, or VPS)
-
-Deploy the `backend` folder as a Python web service:
-
-- **Root Directory**: `backend`
-- **Build Command**: `pip install -r requirements.txt`
-- **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-
-#### Backend Environment Variables:
-| Variable | Description | Example |
-| :--- | :--- | :--- |
-| `GROQ_API_KEY` | Groq AI API key | `gsk_...` |
-| `GROQ_MODEL` | LLM model identifier | `openai/gpt-oss-120b` |
-| `MONGODB_URI` | MongoDB Atlas connection string | `mongodb+srv://...` |
-| `MONGODB_DB_NAME`| Database name | `claimguard` |
-| `FRONTEND_URL` | Deployed frontend domain (for CORS whitelist) | `https://claimguard.vercel.app` |
-| `PORT` | Listening port (injected by host) | `8000` |
-
-> *Tip: For multiple allowed origins, separate URLs with commas: `FRONTEND_URL=https://claimguard.vercel.app,https://claimguard.netlify.app`*
-
----
-
-### 2. Frontend Deployment (Vercel, Netlify, or Cloudflare Pages)
-
-Deploy the `frontend` folder as a static React application:
-
-- **Root Directory**: `frontend`
-- **Build Command**: `npm run build`
-- **Output Directory**: `dist`
-
-#### Frontend Environment Variables:
-| Variable | Description | Example |
-| :--- | :--- | :--- |
-| `VITE_API_BASE_URL` | URL of your deployed backend service | `https://claimguard-backend.onrender.com/api` |
-
-> *Note: `VITE_API_BASE_URL` accepts the backend address with or without `/api` or trailing slashes (e.g. both `https://claimguard-backend.onrender.com` and `https://claimguard-backend.onrender.com/api` resolve correctly).*
 
