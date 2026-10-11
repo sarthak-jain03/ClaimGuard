@@ -21,6 +21,7 @@ from database import (
 from ai_service import analyze_claim_with_groq
 
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
