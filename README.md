@@ -183,3 +183,62 @@ The frontend will be running at [http://localhost:5173](http://localhost:5173).
 
 ---
 
+## Completed and Excluded Scope
+
+### Completed Scope
+- **Interactive Review Dashboard**: Real-time stats, category spending distribution, pending reviews, and live connection status badges.
+- **Two-Tier Review Engine**:
+  - Deterministic rules for spending limits, claim age (30-day warning, 90-day expiry), duplicate detection, and receipt requirements.
+  - LLM-powered compliance verification analyzing claim justifications against policy clauses.
+- **Auditor Workflow & Oversight**: Complete approval lifecycle (Approve, Reject, Request Clarification, Category Override, Reopen) ensuring human oversight over AI recommendations.
+- **Audit Trail**: Chronological event logs tracking every reviewer action and claim state transition.
+- **Dual Persistence**: MongoDB Atlas cloud database support with automatic, resilient fallback to in-memory storage.
+- **Production Deployment**: Hosted live on Vercel with responsive desktop and mobile support.
+
+### Excluded Scope (Intentional Design Decisions)
+- **User Authentication / SSO**: Excluded intentionally to allow evaluators and reviewers to test the application instantly without login barriers.
+- **Live Multi-Currency FX Converter**: Standardized strictly on Indian Rupees (INR, `₹`) across policy caps, claims, and reporting.
+- **Direct OCR Document Scanning**: Receipt attachments are tracked via reference flags and URL links; OCR extraction is planned for future roadmaps.
+
+---
+
+## Automated Tests
+
+ClaimGuard includes a focused unit test suite for the deterministic policy engine, validating core rules and edge cases.
+
+To execute tests:
+
+```bash
+cd backend
+python -m unittest test_policy.py
+```
+
+### Test Coverage:
+- `test_valid_claim_passes`: Ensures valid claims within budget ceilings pass with 0 flags.
+- `test_missing_receipt_over_threshold`: Verifies receipts are mandatory for claims exceeding ₹500.
+- `test_missing_receipt_under_threshold_allowed`: Confirms expenses under ₹500 do not require receipts.
+- `test_category_limit_exceeded`: Tests budget limit enforcement across expense categories.
+- `test_future_date_fails`: Rejects submissions with dates in the future.
+- `test_late_submission_warning`: Flags submissions older than 30 days.
+- `test_expired_claim_over_90_days`: Disallows claims older than 90 days.
+- `test_duplicate_claim_detected`: Detects identical submissions by claimant, date, category, and amount.
+
+---
+
+## Known Limitations
+
+- **MongoDB Atlas Serverless Dynamic IPs**: When deploying on serverless runtimes (like Vercel), MongoDB Atlas Network Access must allow `0.0.0.0/0` because serverless functions lack static outbound IP addresses.
+- **External AI Service Availability**: Policy compliance analysis requires valid Groq API credentials. If rate limits are reached, deterministic rules continue operating unimpeded.
+- **In-Memory Volatility**: If MongoDB Atlas is unavailable, the system safely falls back to in-memory mode, which resets upon serverless function cold starts.
+
+---
+
+## Deployment Details
+
+- **Frontend Deployment**: Hosted on Vercel at `https://claim-guard-lac.vercel.app/`
+- **Backend Deployment**: Hosted on Vercel at `https://claim-guard-rnm7.vercel.app/`
+- **Environment Variables**:
+  - Frontend: `VITE_API_BASE_URL` (configured as **Config** in Vercel) or `BACKEND_URL`
+  - Backend: `GROQ_API_KEY`, `MONGODB_URI`, `MONGODB_DB_NAME`, `FRONTEND_URL`
+- Template environment variables are maintained in `.env.example`.
+
