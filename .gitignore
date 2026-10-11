@@ -1,5 +1,9 @@
 .env
+.env.*
 *.env
+frontend/.env
+!.env.example
+!*.env.example
 config.js
 
 venv/

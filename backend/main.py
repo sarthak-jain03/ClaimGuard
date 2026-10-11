@@ -8,6 +8,10 @@ from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
+
 from policy import EXPENSE_POLICY, CATEGORY_LIMITS, CATEGORY_LABELS, validate_claim
 from database import (
     init_db, get_db_status, get_all_claims, get_claim_by_id,
@@ -29,10 +33,36 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+frontend_url_env = os.getenv("FRONTEND_URL", "").strip()
+cors_origins_env = os.getenv("CORS_ORIGINS", "").strip()
+
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+allowed_origins = list(default_origins)
+
+for val in [frontend_url_env, cors_origins_env]:
+    if val:
+        for item in val.split(","):
+            cleaned = item.strip().rstrip("/")
+            if cleaned and cleaned not in allowed_origins:
+                allowed_origins.append(cleaned)
+
+if "*" in allowed_origins:
+    cors_origins = ["*"]
+    cors_credentials = False
+else:
+    cors_origins = allowed_origins
+    cors_credentials = True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=cors_origins,
+    allow_credentials=cors_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -1,4 +1,10 @@
-const API_BASE_URL = "http://localhost:8000/api";
+const rawBaseUrl = (
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_BACKEND_URL ||
+  "http://localhost:8000/api"
+).trim().replace(/\/+$/, "");
+
+const API_BASE_URL = rawBaseUrl.endsWith("/api") ? rawBaseUrl : `${rawBaseUrl}/api`;
 
 export async function fetchApi(endpoint, options = {}) {
   try {
